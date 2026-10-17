@@ -1,0 +1,17 @@
+# Kubernetes Guestbook Final Project
+# Ignore OS artifacts and local temporary files
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+
+# Archives (do not commit generated zip bundles to git root unless required)
+*.tar.gz
+*.swp
+
+# Sensitive files / credentials (never commit)
+*.env
+*.pem
+*.key
+kubeconfig
+*token*
