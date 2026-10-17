@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guestbook - v1</title>
+    <title>Guestbook - v2</title>
     <style>
         :root {
-            --primary: #0f62fe;
-            --primary-hover: #0353e9;
+            --primary: #0043ce;
+            --primary-hover: #002d9c;
+            --accent: #1192e8;
             --bg-color: #f4f7fb;
             --card-bg: #ffffff;
             --text-main: #161616;
@@ -40,13 +41,27 @@
         }
 
         .header-card {
-            background: linear-gradient(135deg, #0f62fe, #002d9c);
+            background: linear-gradient(135deg, #0043ce, #001d6c);
             color: #ffffff;
             padding: 2rem;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             margin-bottom: 1.5rem;
             text-align: center;
+            position: relative;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background-color: #0072c3;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            margin-bottom: 0.5rem;
         }
 
         h1 {
@@ -96,7 +111,7 @@
         input[type="text"]:focus,
         textarea:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.15);
+            box-shadow: 0 0 0 3px rgba(0, 67, 206, 0.15);
         }
 
         textarea {
@@ -213,7 +228,8 @@
 <body>
     <div class="container">
         <header class="header-card">
-            <h1>Guestbook - v1</h1>
+            <span class="version-badge">Updated Release</span>
+            <h1>Guestbook - v2</h1>
             <p class="subtitle">Cloud Native Kubernetes Guestbook Application</p>
         </header>
 
@@ -228,7 +244,7 @@
                         <label for="messageInput">Your Message</label>
                         <textarea id="messageInput" name="message" placeholder="Write a message for the guestbook..." required></textarea>
                     </div>
-                    <button type="submit" id="submitBtn">Sign Guestbook</button>
+                    <button type="submit" id="submitBtn">Sign Guestbook (v2)</button>
                 </form>
             </section>
 
@@ -244,7 +260,7 @@
         </main>
 
         <footer>
-            <p>IBM Cloud & Kubernetes Skills Network Lab &bull; Release v1.0</p>
+            <p>IBM Cloud & Kubernetes Skills Network Lab &bull; Release v2.0</p>
         </footer>
     </div>
 
@@ -259,14 +275,14 @@
         const initialEntries = [
             {
                 author: "Kubernetes Admin",
-                message: "Welcome to the Guestbook v1 application running on Kubernetes!",
+                message: "Welcome to the Guestbook v2 application running on Kubernetes with Rolling Updates!",
                 timestamp: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
             }
         ];
 
         let entries = [];
         try {
-            const saved = localStorage.getItem('guestbook_v1_entries');
+            const saved = localStorage.getItem('guestbook_v2_entries');
             entries = saved ? JSON.parse(saved) : initialEntries;
         } catch (e) {
             entries = initialEntries;
@@ -311,7 +327,7 @@
 
             entries.unshift(newEntry);
             try {
-                localStorage.setItem('guestbook_v1_entries', JSON.stringify(entries));
+                localStorage.setItem('guestbook_v2_entries', JSON.stringify(entries));
             } catch (err) {}
 
             authorInput.value = '';

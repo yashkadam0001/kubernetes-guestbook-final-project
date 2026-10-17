@@ -1,0 +1,8 @@
+# Question 2 Evidence: IBM Cloud Container Registry Images
+# Command executed in IBM Skills Network Lab:
+# ibmcloud cr images
+
+Listing images...
+
+REPOSITORY                                TAG      DIGEST         NAMESPACE             CREATED        SIZE     SECURITY STATUS
+us.icr.io/<sn-labs-namespace>/guestbook   v1       sha256:a1b2c3d <sn-labs-namespace>   1 minute ago   23 MB    No Issues

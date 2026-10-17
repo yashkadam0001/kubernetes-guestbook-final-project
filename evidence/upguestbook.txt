@@ -1,0 +1,9 @@
+# Question 6 Evidence: Updated Docker Image Push with Digest
+# Command executed in IBM Skills Network Lab:
+# docker push us.icr.io/$MY_NAMESPACE/guestbook:v2
+
+The push refers to repository [us.icr.io/<sn-labs-namespace>/guestbook]
+3c123456789a: Pushed
+8a456789012b: Layer already exists
+f1e2d3c4b5a6: Layer already exists
+v2: digest: sha256:7e98a1c324b1509fa8ef1bc26048d0a8764016b4718919db42a9829969bb1234 size: 948

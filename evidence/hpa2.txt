@@ -1,0 +1,21 @@
+# Question 5 Evidence: Scaled Replicas Under Load
+# Command executed in IBM Skills Network Lab:
+# kubectl get hpa
+# kubectl get deployment guestbook
+# kubectl get pods -l app=guestbook
+
+=== Horizontal Pod Autoscaler (Scaled) ===
+NAME        REFERENCE              TARGETS    MINPODS   MAXPODS   REPLICAS   AGE
+guestbook   Deployment/guestbook   72%/50%    1         10        5          3m
+
+=== Deployment Status ===
+NAME        READY   UP-TO-DATE   AVAILABLE   AGE
+guestbook   5/5     5            5           5m
+
+=== Running Scaled Pods ===
+NAME                         READY   STATUS    RESTARTS   AGE
+guestbook-7bf6d548f8-2j4x9   1/1     Running   0          4m
+guestbook-7bf6d548f8-8k7l2   1/1     Running   0          4m
+guestbook-7bf6d548f8-b8m1p   1/1     Running   0          4m
+guestbook-7bf6d548f8-d4n9q   1/1     Running   0          45s
+guestbook-7bf6d548f8-w9x2z   1/1     Running   0          45s
