@@ -1,7 +1,2 @@
-# Question 4 Evidence: Horizontal Pod Autoscaler Table
-# Command executed in IBM Skills Network Lab:
-# kubectl autoscale deployment guestbook --cpu-percent=50 --min=1 --max=10
-# kubectl get hpa
-
 NAME        REFERENCE              TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
 guestbook   Deployment/guestbook   <unknown>/50%   1         10        3          30s

@@ -1,7 +1,1 @@
-# Question 7 Evidence: Deployment Applied / Configured
-# Command executed in IBM Skills Network Lab:
-# kubectl apply -f deployment.yml
-
-deployment.apps/guestbook created
-# (When reapplied with updated v2 configuration):
-# deployment.apps/guestbook configured
+deployment.apps/guestbook configured
