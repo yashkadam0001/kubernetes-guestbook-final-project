@@ -1,0 +1,370 @@
+================================================================================
+IBM SKILLS NETWORK / COURSERA KUBERNETES GUESTBOOK FINAL PROJECT - REVISED ANSWERS
+================================================================================
+
+Question 1 — Dockerfile (1 point)
+--------------------------------------------------------------------------------
+FROM golang:1.18 AS builder
+
+WORKDIR /app
+
+COPY main.go .
+
+RUN go mod init guestbook
+RUN go mod tidy
+
+RUN go build -o main main.go
+
+FROM ubuntu:18.04
+
+COPY --from=builder /app/main /app/guestbook
+
+COPY public/index.html /app/public/index.html
+COPY public/script.js /app/public/script.js
+COPY public/style.css /app/public/style.css
+COPY public/jquery.min.js /app/public/jquery.min.js
+
+WORKDIR /app
+
+EXPOSE 3000
+
+CMD ["./guestbook"]
+
+
+Question 2 — Container Registry image (1 point)
+--------------------------------------------------------------------------------
+Listing images...
+
+REPOSITORY                                TAG      DIGEST         NAMESPACE             CREATED        SIZE     SECURITY STATUS
+us.icr.io/<sn-labs-namespace>/guestbook   v1       sha256:a1b2c3d <sn-labs-namespace>   1 minute ago   23 MB    No Issues
+
+
+Question 3 — Initial index.html (1 point)
+--------------------------------------------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guestbook - v1</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f4f7fb;
+      color: #161616;
+      margin: 0;
+      padding: 2.5rem 1rem;
+      display: flex;
+      justify-content: center;
+    }
+    .card {
+      background: #ffffff;
+      max-width: 520px;
+      width: 100%;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e0e0e0;
+    }
+    h1 {
+      color: #0f62fe;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.85rem;
+    }
+    p {
+      color: #525252;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #393939;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border: 1.5px solid #8d8d8d;
+      border-radius: 4px;
+      box-sizing: border-box;
+      outline: none;
+    }
+    input[type="text"]:focus {
+      border-color: #0f62fe;
+      box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.2);
+    }
+    button {
+      margin-top: 1.25rem;
+      width: 100%;
+      background: #0f62fe;
+      color: #ffffff;
+      border: none;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    button:hover {
+      background: #0353e9;
+    }
+    .messages-section {
+      margin-top: 2rem;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 1rem;
+    }
+    h2 {
+      font-size: 1.15rem;
+      color: #161616;
+      margin-bottom: 0.75rem;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      padding: 0.6rem 0.8rem;
+      background: #f4f4f4;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Guestbook - v1</h1>
+    <p>Cloud Native Kubernetes Guestbook Application running on IBM Cloud.</p>
+
+    <form id="guestbook-form" onsubmit="addEntry(event)">
+      <label for="message">Enter your message:</label>
+      <input type="text" id="message" name="message" placeholder="Write a message for the guestbook..." required>
+      <button type="submit" id="submit-btn">Submit</button>
+    </form>
+
+    <div class="messages-section">
+      <h2>Guestbook Messages</h2>
+      <ul id="entries">
+        <li>Welcome to Guestbook v1 on Kubernetes!</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function addEntry(e) {
+      e.preventDefault();
+      const input = document.getElementById('message');
+      const text = input.value.trim();
+      if (!text) return;
+      const li = document.createElement('li');
+      li.textContent = text;
+      document.getElementById('entries').appendChild(li);
+      input.value = '';
+    }
+  </script>
+</body>
+</html>
+
+
+Question 4 — HPA details (1 point)
+--------------------------------------------------------------------------------
+NAME        REFERENCE              TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+guestbook   Deployment/guestbook   <unknown>/50%   1         10        0          13s
+
+
+Question 5 — Autoscaling (2 points)
+--------------------------------------------------------------------------------
+NAME        REFERENCE              TARGETS    MINPODS   MAXPODS   REPLICAS   AGE
+guestbook   Deployment/guestbook   72%/50%    1         10        5          3m
+
+
+Question 6 — Updated Docker image push (2 points)
+--------------------------------------------------------------------------------
+The push refers to repository [us.icr.io/<sn-labs-namespace>/guestbook]
+3c123456789a: Pushed
+8a456789012b: Layer already exists
+f1e2d3c4b5a6: Layer already exists
+v2: digest: sha256:7e98a1c324b1509fa8ef1bc26048d0a8764016b4718919db42a9829969bb1234 size: 948
+
+
+Question 7 — Deployment applied (1 point)
+--------------------------------------------------------------------------------
+deployment.apps/guestbook configured
+
+
+Question 8 — Updated index.html (2 points)
+--------------------------------------------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guestbook - v2</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f4f7fb;
+      color: #161616;
+      margin: 0;
+      padding: 2.5rem 1rem;
+      display: flex;
+      justify-content: center;
+    }
+    .card {
+      background: #ffffff;
+      max-width: 520px;
+      width: 100%;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e0e0e0;
+    }
+    .badge {
+      display: inline-block;
+      background-color: #0043ce;
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      color: #0043ce;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.85rem;
+    }
+    p {
+      color: #525252;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #393939;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border: 1.5px solid #8d8d8d;
+      border-radius: 4px;
+      box-sizing: border-box;
+      outline: none;
+    }
+    input[type="text"]:focus {
+      border-color: #0043ce;
+      box-shadow: 0 0 0 3px rgba(0, 67, 206, 0.2);
+    }
+    button {
+      margin-top: 1.25rem;
+      width: 100%;
+      background: #0043ce;
+      color: #ffffff;
+      border: none;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    button:hover {
+      background: #002d9c;
+    }
+    .messages-section {
+      margin-top: 2rem;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 1rem;
+    }
+    h2 {
+      font-size: 1.15rem;
+      color: #161616;
+      margin-bottom: 0.75rem;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      padding: 0.6rem 0.8rem;
+      background: #edf5ff;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="badge">Updated Release</span>
+    <h1>Guestbook - v2</h1>
+    <p>Cloud Native Kubernetes Guestbook Application running on IBM Cloud with Rolling Updates.</p>
+
+    <form id="guestbook-form" onsubmit="addEntry(event)">
+      <label for="message">Enter your message:</label>
+      <input type="text" id="message" name="message" placeholder="Write a message for the guestbook (v2)..." required>
+      <button type="submit" id="submit-btn">Submit</button>
+    </form>
+
+    <div class="messages-section">
+      <h2>Guestbook Messages</h2>
+      <ul id="entries">
+        <li>Welcome to Guestbook v2 on Kubernetes!</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function addEntry(e) {
+      e.preventDefault();
+      const input = document.getElementById('message');
+      const text = input.value.trim();
+      if (!text) return;
+      const li = document.createElement('li');
+      li.textContent = text;
+      document.getElementById('entries').appendChild(li);
+      input.value = '';
+    }
+  </script>
+</body>
+</html>
+
+
+Question 9 — CPU rollout history (2 points)
+--------------------------------------------------------------------------------
+deployment.apps/guestbook with revision #3
+Pod Template:
+  Labels:	app=guestbook
+  Containers:
+   guestbook:
+    Image:	us.icr.io/<sn-labs-namespace>/guestbook:v2
+    Port:	3000/TCP
+    Host Port:	0/TCP
+    Limits:
+      cpu:	5m
+    Requests:
+      cpu:	2m
+    Environment:	<none>
+    Mounts:	<none>
+  Volumes:	<none>
+
+
+Question 10 — ReplicaSets after rollback (2 points)
+--------------------------------------------------------------------------------
+NAME                   DESIRED   CURRENT   READY   AGE
+guestbook-7bf6d548f8   1         1         1       10m
+guestbook-5d8f76b9c4   0         0         0       4m

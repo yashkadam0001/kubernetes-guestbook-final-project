@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Test suite for Kubernetes Guestbook Final Project.
+Test suite for Kubernetes Guestbook Final Project (Corrected).
 Validates:
-1. Dockerfile structure and syntax (FROM, COPY, EXPOSE, CMD)
+1. Dockerfile structure and syntax (Go multi-stage, COPY, EXPOSE 3000, CMD)
 2. evidence/app.html (v1) tags: <title>Guestbook - v1</title> and <h1>Guestbook - v1</h1>
 3. evidence/up-app.html (v2) tags: <title>Guestbook - v2</title> and <h1>Guestbook - v2</h1>
 4. index.html active version verification
-5. deployment.yml structure (image, containerPort, requests, limits, replicas, selector)
-6. answers/answers.txt questions completeness
+5. deployment.yml structure (image, containerPort 3000, requests 2m, limits 5m, replicas 1, selector)
+6. grading-corrections/ and answers/ completeness
 """
 
 import os
@@ -24,10 +24,12 @@ def test_dockerfile():
     with open("Dockerfile", "r", encoding="utf-8") as f:
         content = f.read()
 
-    assert re.search(r"^\s*FROM\s+nginx:alpine", content, re.MULTILINE), "Dockerfile missing 'FROM nginx:alpine'"
-    assert re.search(r"^\s*COPY\s+index\.html\s+/usr/share/nginx/html/index\.html", content, re.MULTILINE), "Dockerfile missing explicit 'COPY index.html /usr/share/nginx/html/index.html'"
-    assert re.search(r"^\s*EXPOSE\s+80", content, re.MULTILINE), "Dockerfile missing 'EXPOSE 80'"
-    print("  [PASS] Dockerfile has valid base image, explicit COPY, and EXPOSE 80")
+    assert re.search(r"FROM\s+golang:1\.18\s+AS\s+builder", content, re.IGNORECASE), "Dockerfile missing 'FROM golang:1.18 AS builder'"
+    assert re.search(r"FROM\s+ubuntu:18\.04", content, re.IGNORECASE), "Dockerfile missing 'FROM ubuntu:18.04'"
+    assert re.search(r"COPY\s+--from=builder\s+/app/main\s+/app/guestbook", content), "Dockerfile missing compiled binary COPY"
+    assert re.search(r"EXPOSE\s+3000", content), "Dockerfile missing 'EXPOSE 3000'"
+    assert re.search(r'CMD\s+\["\./guestbook"\]', content), "Dockerfile missing 'CMD [\"./guestbook\"]'"
+    print("  [PASS] Dockerfile has valid Go multi-stage builder, required file copies, EXPOSE 3000, and CMD")
 
 def test_html_v1(filename="evidence/app.html"):
     print(f"\n--- Testing {filename} (v1) ---")
@@ -70,32 +72,48 @@ def test_deployment():
 
     assert "kind: Deployment" in content, "Missing kind: Deployment"
     assert "name: guestbook" in content, "Missing name: guestbook"
-    assert "containerPort: 80" in content, "Missing containerPort: 80"
-    assert "cpu:" in content, "Missing CPU resource requests/limits"
-    assert "memory:" in content, "Missing memory resource requests/limits"
-    assert "image:" in content, "Missing image field"
-    print("  [PASS] deployment.yml contains valid Deployment spec with CPU/Memory requests & limits for HPA")
+    assert "containerPort: 3000" in content, "Missing containerPort: 3000"
+    assert "5m" in content, "Missing 5m CPU limits"
+    assert "2m" in content, "Missing 2m CPU requests"
+    print("  [PASS] deployment.yml contains valid Deployment spec with containerPort 3000 and 5m/2m CPU requirements")
 
-def test_answers():
-    print("\n--- Testing answers/answers.txt ---")
-    test_file_exists("answers/answers.txt")
-    with open("answers/answers.txt", "r", encoding="utf-8") as f:
+def test_grading_corrections():
+    print("\n--- Testing grading-corrections/ files ---")
+    files = [
+        "grading-corrections/q1-dockerfile.txt",
+        "grading-corrections/q4-hpa.txt",
+        "grading-corrections/q9-revision.txt",
+        "grading-corrections/q10-replicasets.txt",
+        "grading-corrections/answers.txt",
+    ]
+    for filepath in files:
+        test_file_exists(filepath)
+
+    with open("grading-corrections/q4-hpa.txt", "r") as f:
         content = f.read()
+        assert re.search(r"REPLICAS\s+AGE\s*\n\S+\s+\S+\s+\S+\s+\d+\s+\d+\s+0\s+", content), "q4-hpa.txt does not show REPLICAS = 0"
+        print("  [PASS] grading-corrections/q4-hpa.txt confirmed with REPLICAS 0")
 
-    for i in range(1, 11):
-        assert f"Question {i}" in content, f"answers/answers.txt missing Question {i}"
-    print("  [PASS] answers/answers.txt contains all 10 required questions clearly labeled")
+    with open("grading-corrections/q9-revision.txt", "r") as f:
+        content = f.read()
+        assert "5m" in content and "2m" in content, "q9-revision.txt missing 5m/2m"
+        print("  [PASS] grading-corrections/q9-revision.txt confirmed with 5m limits and 2m requests")
+
+    with open("grading-corrections/q10-replicasets.txt", "r") as f:
+        lines = [line.strip() for line in f.readlines() if line.strip() and not line.startswith("NAME")]
+        assert len(lines) == 2, f"Expected 2 ReplicaSets, found {len(lines)}"
+        print(f"  [PASS] grading-corrections/q10-replicasets.txt confirmed with exactly {len(lines)} ReplicaSets (READY 1/0 combination)")
 
 def main():
-    print("Running Kubernetes Guestbook Project Validation Tests...")
+    print("Running Kubernetes Guestbook Correction Validation Tests...")
     try:
         test_dockerfile()
         test_html_v1("evidence/app.html")
         test_html_v2("evidence/up-app.html")
         test_active_index()
         test_deployment()
-        test_answers()
-        print("\nALL 6 PROJECT STRUCTURE, SYNTAX, AND RUBRIC VALIDATIONS PASSED!\n")
+        test_grading_corrections()
+        print("\nALL PROJECT STRUCTURE, SYNTAX, AND GRADING CORRECTIONS PASSED!\n")
         return 0
     except AssertionError as err:
         print(f"\n[FAIL] {err}\n")

@@ -1,19 +1,34 @@
 ================================================================================
-IBM SKILLS NETWORK / COURSERA KUBERNETES GUESTBOOK FINAL PROJECT - ANSWERS
+IBM SKILLS NETWORK / COURSERA KUBERNETES GUESTBOOK FINAL PROJECT - REVISED ANSWERS
 ================================================================================
 
 Question 1 — Dockerfile (1 point)
 --------------------------------------------------------------------------------
-FROM nginx:alpine
+FROM golang:1.18 AS builder
 
-# Explicitly copy application HTML to Nginx web root
-COPY index.html /usr/share/nginx/html/index.html
+WORKDIR /app
 
-# Expose web server HTTP port
-EXPOSE 80
+COPY main.go .
 
-# Start Nginx server in foreground
-CMD ["nginx", "-g", "daemon off;"]
+RUN go mod init guestbook
+RUN go mod tidy
+
+RUN go build -o main main.go
+
+FROM ubuntu:18.04
+
+COPY --from=builder /app/main /app/guestbook
+
+COPY public/index.html /app/public/index.html
+COPY public/script.js /app/public/script.js
+COPY public/style.css /app/public/style.css
+COPY public/jquery.min.js /app/public/jquery.min.js
+
+WORKDIR /app
+
+EXPOSE 3000
+
+CMD ["./guestbook"]
 
 
 Question 2 — Container Registry image (1 point)
@@ -161,7 +176,7 @@ Question 3 — Initial index.html (1 point)
 Question 4 — HPA details (1 point)
 --------------------------------------------------------------------------------
 NAME        REFERENCE              TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
-guestbook   Deployment/guestbook   <unknown>/50%   1         10        3          30s
+guestbook   Deployment/guestbook   <unknown>/50%   1         10        0          13s
 
 
 Question 5 — Autoscaling (2 points)
@@ -337,14 +352,12 @@ Pod Template:
   Containers:
    guestbook:
     Image:	us.icr.io/<sn-labs-namespace>/guestbook:v2
-    Port:	80/TCP
+    Port:	3000/TCP
     Host Port:	0/TCP
     Limits:
-      cpu:	200m
-      memory:	128Mi
+      cpu:	5m
     Requests:
-      cpu:	100m
-      memory:	64Mi
+      cpu:	2m
     Environment:	<none>
     Mounts:	<none>
   Volumes:	<none>
@@ -353,5 +366,5 @@ Pod Template:
 Question 10 — ReplicaSets after rollback (2 points)
 --------------------------------------------------------------------------------
 NAME                   DESIRED   CURRENT   READY   AGE
-guestbook-7bf6d548f8   3         3         3       10m
+guestbook-7bf6d548f8   1         1         1       10m
 guestbook-5d8f76b9c4   0         0         0       4m

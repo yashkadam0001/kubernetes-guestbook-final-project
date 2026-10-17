@@ -1,10 +1,25 @@
-FROM nginx:alpine
+FROM golang:1.18 AS builder
 
-# Explicitly copy application HTML to Nginx web root
-COPY index.html /usr/share/nginx/html/index.html
+WORKDIR /app
 
-# Expose web server HTTP port
-EXPOSE 80
+COPY main.go .
 
-# Start Nginx server in foreground
-CMD ["nginx", "-g", "daemon off;"]
+RUN go mod init guestbook
+RUN go mod tidy
+
+RUN go build -o main main.go
+
+FROM ubuntu:18.04
+
+COPY --from=builder /app/main /app/guestbook
+
+COPY public/index.html /app/public/index.html
+COPY public/script.js /app/public/script.js
+COPY public/style.css /app/public/style.css
+COPY public/jquery.min.js /app/public/jquery.min.js
+
+WORKDIR /app
+
+EXPOSE 3000
+
+CMD ["./guestbook"]
